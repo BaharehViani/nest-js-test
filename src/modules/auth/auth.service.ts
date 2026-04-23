@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -8,8 +8,8 @@ import {
   createToken,
   checkExpiration,
   validatePassToken,
-} from '../utils/module';
-import { getMessage } from '../message/message.service';
+} from '../../utils/module';
+import { getMessage } from '../../message/message.service';
 
 @Injectable()
 export class AuthService {
