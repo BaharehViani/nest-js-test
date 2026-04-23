@@ -1,0 +1,53 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum FunctionalPermission {
+  CREATE_ESTATE
+  MANAGE_ESTATE
+  GET_ARCHIVE
+  GET_ESTATE
+  GET_ESTATE_ADDRESS
+  GET_ESTATE_OWNERS
+  EDIT_USERS
+  GET_USER
+  CREATE_CAT
+  EDIT_CAT
+  GET_CAT
+  MANAGE_SESSION
+  CREATE_SESSION
+  GET_SESSION
+  SUPER_USER
+  USER
+  OWNER
+}
+
+model User {
+  id          String                 @id @default(uuid())
+  firstName   String
+  lastName    String
+  phoneNumber String                 @unique
+  password    String?
+  accessPerms FunctionalPermission[]
+  isActive    Boolean                @default(true)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+}
+
+model Session {
+  id          String   @id @default(uuid())
+  phoneNumber String
+  code        String
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+}
