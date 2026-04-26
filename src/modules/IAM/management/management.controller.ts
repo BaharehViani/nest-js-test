@@ -137,6 +137,7 @@ export class ManagementController {
   @Get('getPersonal')
   @ApiOkResponse({ type: ManagementDtos.UserInfoResponseDto })
   async getPersonalInformation(
+    @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.UserIdQueryDto,
     @Req() req: any,
   ) {

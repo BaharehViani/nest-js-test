@@ -41,13 +41,13 @@ export class AuthService {
         });
         if (sessionExist) code = sessionExist.code;
 
-        const messageResult = await sendMessage(phoneNumber, code, null);
-        if (messageResult == false) {
-          return {
-            code: 0,
-            message: getMessage('SYSTEM_ERROR', 'ERROR_SEND_OTPCODE'),
-          };
-        }
+        // const messageResult = await sendMessage(phoneNumber, code, null);
+        // if (messageResult == false) {
+        //   return {
+        //     code: 0,
+        //     message: getMessage('SYSTEM_ERROR', 'ERROR_SEND_OTPCODE'),
+        //   };
+        // }
 
         await this.prisma.session.deleteMany({ where: { phoneNumber } });
 
@@ -59,6 +59,7 @@ export class AuthService {
           },
         });
 
+        console.log("code",code)
         return {
           code: 1,
           message: getMessage('SUCCESS', 'SUCCEED_OTPCODE_SEND'),
