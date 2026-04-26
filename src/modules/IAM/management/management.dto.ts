@@ -82,3 +82,35 @@ export class SendMessageQueryDto {
   @IsString() entityId: string;
   @IsEnum(['OWNER']) type: 'OWNER';
 }
+
+export class MessageResponseDto {
+  message: string;
+}
+
+class UserInListDto {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  isActive: boolean;
+  avatar: string;
+  accessPerms: string[];
+}
+
+class PaginationDto {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export class UserListResponseDto {
+  message: string;
+  users: UserInListDto[];
+  pagination: PaginationDto;
+}
+
+export class UserInfoResponseDto {
+  message: string;
+  data: UserInListDto; 
+}

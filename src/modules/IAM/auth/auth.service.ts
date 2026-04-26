@@ -7,7 +7,8 @@ import {
   generateOTP,
   createToken,
   checkExpiration,
-  validatePassToken, sendMessage
+  validatePassToken,
+  sendMessage,
 } from '../../../utils/module';
 import { getMessage } from '../../../message/message.service';
 
@@ -40,10 +41,13 @@ export class AuthService {
         });
         if (sessionExist) code = sessionExist.code;
 
-          const messageResult = await sendMessage(phoneNumber, code , null);
-          if(messageResult == false){
-              return {code : 0 , message : getMessage("SYSTEM_ERROR", "ERROR_SEND_OTPCODE")}
-          }
+        const messageResult = await sendMessage(phoneNumber, code, null);
+        if (messageResult == false) {
+          return {
+            code: 0,
+            message: getMessage('SYSTEM_ERROR', 'ERROR_SEND_OTPCODE'),
+          };
+        }
 
         await this.prisma.session.deleteMany({ where: { phoneNumber } });
 
@@ -98,6 +102,10 @@ export class AuthService {
               code: 0,
               message: getMessage('USER_ERROR', 'ERROR_INVALID_PHONENUMBER'),
             };
+          
+          if (user.isActive === false) {
+            return { code: 0, message: 'حساب شما مسدود شده است' };
+          }
 
           const session = await this.prisma.session.findFirst({
             where: { phoneNumber },
@@ -142,6 +150,9 @@ export class AuthService {
           const user = await this.prisma.user.findFirst({
             where: { phoneNumber },
           });
+          if (user?.isActive === false) {
+            return { code: 0, message: 'حساب شما مسدود شده است' };
+          }
           if (!user?.password)
             return {
               code: 0,

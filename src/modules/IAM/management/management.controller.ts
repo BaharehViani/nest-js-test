@@ -20,6 +20,7 @@ export class ManagementController {
 
   // -----------------------PUT---------------------
   @Put('editPermission')
+  @ApiOkResponse({ type: ManagementDtos.MessageResponseDto })
   async editUserPermission(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.UserIdQueryDto,
@@ -39,6 +40,7 @@ export class ManagementController {
   }
 
   @Put('editProfile')
+  @ApiOkResponse({ type: ManagementDtos.MessageResponseDto })
   async editUserProfile(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.UserIdQueryDto,
@@ -56,6 +58,7 @@ export class ManagementController {
   }
 
   @Put('editStatus')
+  @ApiOkResponse({ type: ManagementDtos.MessageResponseDto })
   async editUserStatus(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.EditUserStatusQueryDto,
@@ -74,7 +77,7 @@ export class ManagementController {
 
   // -----------------------GET---------------------
   @Get('getList')
-  @ApiOkResponse()
+  @ApiOkResponse({ type: ManagementDtos.UserListResponseDto })
   async getUserList(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.GetUserListQueryDto,
@@ -101,7 +104,7 @@ export class ManagementController {
   }
 
   @Get('get')
-  @ApiOkResponse()
+  @ApiOkResponse({ type: ManagementDtos.UserInfoResponseDto })
   async getUserInformation(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.UserIdQueryDto,
@@ -123,6 +126,7 @@ export class ManagementController {
   }
 
   @Get('getPersonal')
+  @ApiOkResponse({ type: ManagementDtos.UserInfoResponseDto })
   async getPersonalInformation(
     @Query() query: ManagementDtos.UserIdQueryDto,
     @Req() req: any,
@@ -137,6 +141,7 @@ export class ManagementController {
   }
 
   @Get('getListWithAccess')
+  @ApiOkResponse({ type: ManagementDtos.UserListResponseDto })
   async getListWithAccess(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.GetUserListWithAccessQueryDto,
@@ -156,6 +161,7 @@ export class ManagementController {
 
   // -----------------------POST---------------------
   @Post('sendMessage')
+  @ApiOkResponse({ type: ManagementDtos.MessageResponseDto })
   async messageSender(
     @Headers() headers: ManagementDtos.AuthHeaderDto,
     @Query() query: ManagementDtos.SendMessageQueryDto,
