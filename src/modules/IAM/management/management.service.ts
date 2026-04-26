@@ -343,8 +343,8 @@ export class ManagementService {
           users,
           pagination: {
             total,
-            page,
-            limit,
+            page: currentPage,
+            limit: perPage,
             totalPages: Math.ceil(total / perPage),
           },
         },
