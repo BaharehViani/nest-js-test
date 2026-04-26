@@ -112,8 +112,8 @@ export class ManagementService {
   async editUserPermissionService(
     editorId: string,
     userId: string,
-    category: any[],
-    accessPerms: any[],
+    category: any,
+    accessPerms: any,
   ) {
     try {
       const editor = await this.prisma.user.findUnique({
@@ -156,14 +156,14 @@ export class ManagementService {
           await tx.userPermission.update({
             where: { id: user.userPermission.id },
             data: {
-              category: { set: category.map((cat) => ({ id: cat.id })) },
+              category: { set: category.map((cat: any) => ({ id: cat.id })) },
             },
           });
         } else {
           await tx.userPermission.create({
             data: {
               user: { connect: { id: userId } },
-              category: { connect: category.map((cat) => ({ id: cat.id })) },
+              category: { connect: category.map((cat: any) => ({ id: cat.id })) },
             },
           });
         }
@@ -331,7 +331,7 @@ export class ManagementService {
         this.prisma.user.findMany({
           where,
           skip,
-          take: limit,
+          take: perPage,
           orderBy: { updatedAt: 'desc' },
         }),
         this.prisma.user.count({ where }),
