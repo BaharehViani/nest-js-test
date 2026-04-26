@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import * as AuthDtos from './auth.dto';
-import { getMessage } from '../../message/message.service';
+import { getMessage } from '../../../message/message.service';
 import { ApiOkResponse } from '@nestjs/swagger';
 
 @Controller('auth')

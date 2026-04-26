@@ -1,6 +1,7 @@
-import { IsBoolean, IsString, IsOptional, IsNotEmpty, Matches } from 'class-validator';
+import { IsBoolean, IsString, IsOptional } from 'class-validator';
 
 export class AuthHeaderDto {
+  @IsString()
   authorization: string;
 }
 

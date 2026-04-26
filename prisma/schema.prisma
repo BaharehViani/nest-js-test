@@ -1,7 +1,8 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -10,6 +11,111 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum DealStatus {
+  SUCCESS
+  UNSUCCESS
+  PENDING
+}
+
+enum ActionResult {
+  PENDING
+  LIKE
+  DISLIKE
+}
+
+enum EstateGrade {
+  GOOD
+  NORMAL
+  BAD
+}
+
+enum SessionStatus {
+  PENDING
+  CONFIRMED
+  REJECTED
+  CANCELED
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+}
+
+enum ReminderType {
+  SMS
+  Notification
+}
+
+enum LogType {
+  CREATE
+  DELETE
+  UPDATE
+}
+
+enum DealType {
+  FOR_SALE /// فروش
+  FOR_RENT /// رهن و اجاره
+  PARTICIPATION /// مشارکت در ساخت
+  PRE_SALE /// پیش فروش
+}
+
+enum MainCategory {
+  RESIDENTIAL // مسکونی
+  COMMERCIAL //تجاری
+  INDUSTRIAL // صنعتی
+  SERVICE // خدماتی
+  VILLA // باغ/ویلا
+}
+
+enum EstateRequestType {
+  ARCHIVE
+  DELETE
+  EDIT
+  UNARCHIVE
+  UNDELETE
+}
+
+enum EstateRequestStatus {
+  APPROVED
+  PENDING
+  REJECT
+  DELETE
+  CANCEL
+}
+
+enum PropertyType {
+  APARTMENT //آپارتمان,
+  REAL_ESTATE_LAND //مستغلات / زمین,
+  OFFICE_CLINIC //دفتر کار / مطب,
+  REAL_ESTATE //مستغلات,
+  HOTEL //هتل,
+  SHOP //مغازه,
+  LAND //زمین,
+  VILLA //ویلا,
+  WORKSHOP_FACTORY //کارگاه / کارخونه,
+  WAREHOUSE_HALL //انبار / سوله,
+  BASEMENT //زیر زمین,
+  GAS_STATION //پمپ بنزین,
+  VILLA_LAND //زمین ویلایی,
+  COLD_STORAGE //سردخانه
+}
+
+enum EstateStatus {
+  PENDING
+  PUBLISH
+}
+
+enum ArchiveStatus {
+  DELETE
+  ARCHIVE
+}
+
+enum ListingStatus {
+  ACTIVE
+  EXPIRED
+  REMOVED
 }
 
 enum FunctionalPermission {
@@ -32,16 +138,235 @@ enum FunctionalPermission {
   OWNER
 }
 
+enum Plarform {
+  Divar
+  Sheypor
+  Other
+}
+
 model User {
-  id          String                 @id @default(uuid())
-  firstName   String
-  lastName    String
-  phoneNumber String                 @unique
-  password    String?
-  accessPerms FunctionalPermission[]
-  isActive    Boolean                @default(true)
-  createdAt   DateTime               @default(now())
-  updatedAt   DateTime               @updatedAt
+  id             String                 @id @default(uuid())
+  firstName      String?
+  lastName       String?
+  email          String?
+  password       String?
+  birthdate      String?
+  education      String?
+  fixPhoneNumber String?
+  phoneNumber    String                 @unique
+  accessPerms    FunctionalPermission[]
+  address        String?
+  avatar         Json?
+  isActive       Boolean                @default(true)
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+  position       String?
+
+  // Self relation
+  creatorId    String?
+  creator      User?   @relation("UserCreator", fields: [creatorId], references: [id])
+  createdUsers User[]  @relation("UserCreator")
+
+  userPermission   UserPermission? @relation(fields: [userPermissionId], references: [id])
+  userPermissionId String?         @unique
+
+  meetingCustomer      Meeting[]             @relation("__meetingCustomer")
+  meetings             UserMeeting[]
+  createdMeetings      Meeting[]             @relation("__CreatedMeetings")
+  createdMeetingsDate  MeetingDate[]         @relation("__CreatedMeetingsDate")
+  logs                 Log[]                 @relation("LogCreatedBy")
+  notes                Note[]
+  createdEstates       Estate[]              @relation("EstateCreator")
+  ownedEstates         Estate[]              @relation("EstateOwners")
+  reminders            Reminder[]
+  estateRequests       EstateRequest[]
+  reviewerRequests     EstateRequest[]       @relation("EstateRequestReviewer")
+  notification         Notification[]
+  savedEstates         Estate[]              @relation("__SavedEstate")
+  clientEstateRequests ClientEstateRequest[]
+  Estate               Estate[]              @relation("__EstateCreatorUser")
+  referral             Estate[]              @relation("EstateReferral")
+  visitAdvisor         Visit[]               @relation("AdvisorToVisit")
+  visitCustomer        Visit[]               @relation("CustomerToVisit")
+  dealCustomer         DealPosibility[]      @relation("__CustomerToDealPosibility")
+  dealAdvisor          DealPosibility[]      @relation("__AdvisorToDealPosibility")
+  logsCreatedFor       Log[]                 @relation("LogCreatedFor")
+  estateAdverise       ExternalListing[]
+}
+
+model UserPermission {
+  id        String     @id @default(uuid())
+  user      User?
+  category  Category[] @relation("__PermissionCategory")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Category {
+  id                   String                @id @default(uuid())
+  dealType             DealType? // فروش، اجاره، ...
+  mainCategory         MainCategory? // مسکونی، تجاری
+  propertyType         PropertyType?
+  name                 String
+  description          String?
+  category             UserPermission[]      @relation("__PermissionCategory")
+  parentId             String?
+  isRegion             Boolean               @default(false)
+  parent               Category?             @relation("__CategoryHierarchy", fields: [parentId], references: [id])
+  children             Category[]            @relation("__CategoryHierarchy") //store direct childrens
+  estates              Estate[]
+  allChildren          String[]              @default([]) //all the children categories' ids
+  clientEstateRequests ClientEstateRequest[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+
+  @@unique([name, parentId])
+}
+
+model Estate {
+  id                 String         @id @default(uuid())
+  title              String
+  description        String?
+  note               String?
+  findBy             String?
+  referral           User[]         @relation("EstateReferral")
+  address            String
+  approximateAddress String
+  buildYear          Int?
+  landingId          String?
+  floor              String?
+  owners             User[]         @relation("EstateOwners")
+  visit              Visit[]        @relation("EstateToVisit")
+  adviserId          String?
+  adviser            User?          @relation("EstateCreator", fields: [adviserId], references: [id])
+  landings           Landing[]      @relation("__EstateLandings")
+  categoryId         String?
+  category           Category?      @relation(fields: [categoryId], references: [id])
+  inventory          Int?
+  status             EstateStatus
+  archiveStatus      ArchiveStatus?
+  estateGrade        EstateGrade?
+  meetings           Meeting[]      @relation("__EstateMeetings")
+  notes              Note[]
+  userSaved          User[]         @relation("__SavedEstate")
+  estateCode         Int            @default(autoincrement())
+  reminders          Reminder[]
+  percentage         Int?
+  creatorId          String?
+  creator            User?          @relation("__EstateCreatorUser", fields: [creatorId], references: [id])
+
+  //counts
+  roomCount      Int?
+  unitCount      Int?
+  floorCount     Int?
+  floorUnitCount Int?
+
+  //metrage
+  metrage       Int
+  soleMetrage   Int?
+  ayanMetrage   Int?
+  floorMetrage  Int?
+  dahaneMetrage Int?
+  banaMetrage   Int?
+  arzMelk       Int?
+  arzGozar      Int?
+  tolMelk       Int?
+  height        Int?
+  files         Json?
+  balkonMetrage Int?
+
+  //price
+  totalPrice   BigInt?
+  rahnPrice    BigInt?
+  ejarePrice   BigInt?
+  metragePrice BigInt?
+
+  landType String?
+
+  //facilities
+  location     String[]
+  parkingCount Int?
+
+  properties Json?
+
+  residenceStatus String?
+  tenantExiteDate DateTime?
+  estateRequest   EstateRequest[]
+  dealPosibility  DealPosibility[] @relation("__EstateToDealPosibility")
+
+  listings ExternalListing[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ExternalListing {
+  id String @id @default(uuid())
+
+  estateId String
+  platform Plarform
+
+  title String? // عنوانی که تو پلتفرم زده
+  url   String?
+
+  status ListingStatus @default(ACTIVE)
+
+  publishedAt DateTime?
+  expiresAt   DateTime?
+
+  nardobanDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  creatorId  String
+  creator    User  @relation(fields: [creatorId] , references: [id])
+
+  estate Estate @relation(fields: [estateId], references: [id])
+
+  @@index([estateId])
+  @@index([platform])
+  @@index([status])
+  @@index([expiresAt])
+  @@index([creatorId])
+}
+
+model EstateRequest {
+  id              String               @id @default(uuid())
+  estate          Estate               @relation(fields: [estateId], references: [id], onDelete: Cascade)
+  estateStatus    EstateStatus
+  estateId        String
+  userId          String
+  user            User                 @relation(fields: [userId], references: [id])
+  type            EstateRequestType
+  status          EstateRequestStatus?
+  file            Json?
+  note            String?
+  title           String?
+  description     String?
+  contractEndTime DateTime?
+  reviewerId      String?
+  reviewer        User?                @relation("EstateRequestReviewer", fields: [reviewerId], references: [id])
+  change          Json?
+  createdAt       DateTime             @default(now())
+  updateAt        DateTime             @updatedAt
+}
+
+model Reminder {
+  id           String         @id @default(uuid())
+  estateId     String?
+  estate       Estate?        @relation(fields: [estateId], references: [id])
+  mettingId    String?
+  metting      Meeting?       @relation(fields: [mettingId], references: [id])
+  userId       String
+  user         User           @relation(fields: [userId], references: [id])
+  reminderDate DateTime
+  message      String?
+  description  String
+  title        String
+  type         ReminderType[]
+  status       ReminderStatus @default(PENDING)
+  createdAt    DateTime       @default(now())
 }
 
 model Session {
@@ -50,4 +375,202 @@ model Session {
   code        String
   createdAt   DateTime @default(now())
   expiresAt   DateTime
+}
+
+model Landing {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String?
+  estates     Estate[] @relation("__EstateLandings")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Meeting {
+  id                      String           @id @default(uuid())
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  title                   String
+  description             String?
+  startSession            DateTime
+  endSession              DateTime?
+  room                    Int
+  sellerName              String?
+  status                  SessionStatus
+  users                   UserMeeting[]
+  customerId              String?
+  customer                User?            @relation("__meetingCustomer", fields: [customerId], references: [id])
+  creatorId               String
+  creator                 User             @relation("__CreatedMeetings", fields: [creatorId], references: [id])
+  estateId                String?
+  estate                  Estate?          @relation("__EstateMeetings", fields: [estateId], references: [id])
+  notes                   Note[]
+  reminder                Reminder[]
+  paymentMethod           String?
+  ownerPrice              BigInt?
+  ownerFinalPrice         BigInt?
+  applicantName           String?
+  applicantPhoneNumber    String?
+  applicantBudget         BigInt?
+  applicantFinalBudget    BigInt?
+  attractApplicantsMethod String?
+  meetingResult           ActionResult?
+  dealPosibility          DealPosibility[] @relation("__MeetingToDealPosibility")
+  qOne                    String?
+  qTwo                    String?
+  qThree                  Boolean?
+  qFour                   Boolean?
+}
+
+model UserMeeting {
+  userId    String
+  meetingId String
+  percent   Int?
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  @@id([userId, meetingId])
+}
+
+model MeetingDate {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  date      DateTime
+  creatorId String
+  creator   User     @relation("__CreatedMeetingsDate", fields: [creatorId], references: [id])
+}
+
+model Log {
+  id          String @id @default(uuid())
+  description Json?
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  actionType LogType
+  modelName  String
+  contentId  String
+
+  createdById String
+  createdBy   User   @relation("LogCreatedBy", fields: [createdById], references: [id])
+
+  createdForId String?
+  createdFor   User?   @relation("LogCreatedFor", fields: [createdForId], references: [id])
+
+  note   Note?   @relation(fields: [noteId], references: [id])
+  noteId String? @unique
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  text      String
+  log       Log?
+  meetingId String?
+  meeting   Meeting? @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+
+  estateId String?
+  estate   Estate? @relation(fields: [estateId], references: [id], onDelete: Cascade)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  description String
+  type        String?
+  read        Boolean  @default(false)
+  estateId    String?
+  meetingId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ClientEstateRequest {
+  id         String    @id @default(uuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id])
+
+  title       String
+  description String?
+
+  minMetrage    Int?
+  maxMetrage    Int?
+  dahaneMetrage Int?
+  height        Int?
+
+  roomCount      Int?
+  floorCount     Int?
+  floorUnitCount Int?
+
+  minTotalPrice   BigInt?
+  maxTotalPrice   BigInt?
+  maxRahnPrice    BigInt?
+  minRahnPrice    BigInt?
+  maxEjarePrice   BigInt?
+  minEjarePrice   BigInt?
+  maxMetragePrice BigInt?
+  minMetragePrice BigInt?
+
+  minFloor String?
+  maxFloor String?
+
+  buildYear  Int?
+  location   String[]
+  properties Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([categoryId])
+}
+
+model Visit {
+  id             String           @id @default(uuid())
+  title          String
+  description    String?
+  visitTime      DateTime
+  isActive       Boolean
+  estateId       String
+  estate         Estate           @relation("EstateToVisit", fields: [estateId], references: [id], onDelete: Cascade)
+  advisorId      String
+  advisor        User             @relation("AdvisorToVisit", fields: [advisorId], references: [id], onDelete: Cascade)
+  customerId     String
+  customer       User             @relation("CustomerToVisit", fields: [customerId], references: [id], onDelete: Cascade)
+  visitResult    ActionResult?
+  dealPosibility DealPosibility[] @relation("__VisitToDealPosibility")
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([advisorId])
+  @@index([customerId])
+  @@index([estateId])
+}
+
+model DealPosibility {
+  id          String   @id @default(uuid())
+  description String?
+  customerId  String
+  customer    User     @relation("__CustomerToDealPosibility", fields: [customerId], references: [id], onDelete: Cascade)
+  estateId    String
+  estate      Estate   @relation("__EstateToDealPosibility", fields: [estateId], references: [id], onDelete: Cascade)
+  visitId     String?
+  visit       Visit?   @relation("__VisitToDealPosibility", fields: [visitId], references: [id], onDelete: Cascade)
+  meetingId   String?
+  meeting     Meeting? @relation("__MeetingToDealPosibility", fields: [meetingId], references: [id], onDelete: Cascade)
+  advisorId   String?
+  advisor     User?    @relation("__AdvisorToDealPosibility", fields: [advisorId], references: [id], onDelete: Cascade)
+  status      DealStatus
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

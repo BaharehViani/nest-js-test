@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '../../../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -7,9 +7,9 @@ import {
   generateOTP,
   createToken,
   checkExpiration,
-  validatePassToken,
-} from '../../utils/module';
-import { getMessage } from '../../message/message.service';
+  validatePassToken, sendMessage
+} from '../../../utils/module';
+import { getMessage } from '../../../message/message.service';
 
 @Injectable()
 export class AuthService {
@@ -40,10 +40,10 @@ export class AuthService {
         });
         if (sessionExist) code = sessionExist.code;
 
-        //   const messageResult = await sendMessage(phoneNumber, code , null);
-        //   if(messageResult == false){
-        //       return {code : 0 , message : getMessage("SYSTEM_ERROR", "ERROR_SEND_OTPCODE", lang)}
-        //   }
+          const messageResult = await sendMessage(phoneNumber, code , null);
+          if(messageResult == false){
+              return {code : 0 , message : getMessage("SYSTEM_ERROR", "ERROR_SEND_OTPCODE")}
+          }
 
         await this.prisma.session.deleteMany({ where: { phoneNumber } });
 
