@@ -11,7 +11,7 @@ import {
 export class ManagementService {
   constructor(private prisma: PrismaService) {}
 
-  async getUserList(
+  async getUserListService(
     role?: any,
     page?: number,
     limit?: number,
@@ -75,7 +75,7 @@ export class ManagementService {
     }
   }
 
-  async getUserInformation(userId: string) {
+  async getUserInformationService(userId: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -109,7 +109,7 @@ export class ManagementService {
     }
   }
 
-  async editUserPermission(
+  async editUserPermissionService(
     editorId: string,
     userId: string,
     category: any[],
@@ -199,7 +199,19 @@ export class ManagementService {
     }
   }
 
-  async editUserProfile(editorId: string, userId: string, data: any) {
+  async editUserProfileService(
+    editorId: string,
+    userId: string,
+    firstName: string,
+    lastName: string,
+    birthdate: string | undefined,
+    phoneNumber: string,
+    address: string | undefined,
+    education: string | undefined,
+    fixPhoneNumber: string | undefined,
+    email: string | undefined,
+    avatar: any,
+  ) {
     try {
       const editor = await this.prisma.user.findUnique({
         where: { id: editorId },
@@ -222,7 +234,17 @@ export class ManagementService {
 
       await this.prisma.user.update({
         where: { id: userId },
-        data: { ...data, email: data.email || undefined },
+        data: {
+          firstName,
+          lastName,
+          phoneNumber,
+          address,
+          education,
+          fixPhoneNumber,
+          email: email == undefined ? undefined : email,
+          birthdate,
+          avatar,
+        },
       });
       return { code: 1, message: 'اطلاعات با موفقیت ذخیره شد' };
     } catch (e) {
@@ -230,7 +252,7 @@ export class ManagementService {
     }
   }
 
-  async editUserStatus(editorId: string, userId: string, status: boolean) {
+  async editUserStatusService(editorId: string, userId: string, status: boolean) {
     try {
       if (editorId === userId)
         return { code: 0, message: 'نمیتوانید خودتان را غیر فعال کنید' };
@@ -261,7 +283,7 @@ export class ManagementService {
     }
   }
 
-  async getPersonalInformation(userId: string) {
+  async getPersonalInformationService(userId: string) {
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -286,7 +308,7 @@ export class ManagementService {
     }
   }
 
-  async getUserListWithAccess(
+  async getUserListWithAccessService(
     page?: number,
     limit?: number,
     search?: string,
@@ -332,7 +354,7 @@ export class ManagementService {
     }
   }
 
-  async messageSender(userId: string, entityId: string, type: string) {
+  async messageSenderService(userId: string, entityId: string, type: string) {
     try {
       const user = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!user) return { code: 0, message: 'آیدی ارسال شده نامعتبر است' };

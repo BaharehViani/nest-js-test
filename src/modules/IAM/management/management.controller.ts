@@ -12,9 +12,10 @@ import {
 } from '@nestjs/common';
 import { ManagementService } from './management.service';
 import * as ManagementDtos from './management.dto';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-@Controller('management')
+@ApiTags('ADMIN/MANAGEMENT')
+@Controller('admin/management')
 export class ManagementController {
   constructor(private managementService: ManagementService) {}
 
@@ -29,7 +30,7 @@ export class ManagementController {
   ) {
     if (!req.userData)
       throw new UnauthorizedException('توکن ارسال شده نامعتبر است');
-    const result = await this.managementService.editUserPermission(
+    const result = await this.managementService.editUserPermissionService(
       req.userData.userId,
       query.id,
       body.category,
@@ -48,10 +49,18 @@ export class ManagementController {
     @Req() req: any,
   ) {
     if (!req.userData) throw new UnauthorizedException('دسترسی نامعتبر است');
-    const result = await this.managementService.editUserProfile(
+    const result = await this.managementService.editUserProfileService(
       req.userData.userId,
       query.id,
-      body,
+      req.body.firstName,
+      req.body.lastName,
+      req.body.birthDate,
+      req.body.phoneNumber,
+      req.body.address,
+      req.body.education,
+      req.body.fixPhoneNumber,
+      req.body.email,
+      req.body.avatar,
     );
     if (result.code === 1) return { message: result.message };
     throw new BadRequestException(result.message);
@@ -66,7 +75,7 @@ export class ManagementController {
   ) {
     if (!req.userData)
       throw new UnauthorizedException('دسترسی کاربر نامعتبر است');
-    const result = await this.managementService.editUserStatus(
+    const result = await this.managementService.editUserStatusService(
       req.userData.userId,
       query.userId,
       query.status,
@@ -87,7 +96,7 @@ export class ManagementController {
       throw new UnauthorizedException('دسترسی نامعتبر است');
     }
 
-    const result = await this.managementService.getUserList(
+    const result = await this.managementService.getUserListService(
       query.role,
       query.page,
       query.limit,
@@ -114,7 +123,7 @@ export class ManagementController {
       throw new UnauthorizedException('دسترسی نامعتبر است');
     }
 
-    const result = await this.managementService.getUserInformation(query.id);
+    const result = await this.managementService.getUserInformationService(query.id);
 
     if (result.code === 1) {
       return {
@@ -132,7 +141,7 @@ export class ManagementController {
     @Req() req: any,
   ) {
     if (!req.userData) throw new UnauthorizedException('دسترسی نامعتبر است');
-    const result = await this.managementService.getPersonalInformation(
+    const result = await this.managementService.getPersonalInformationService(
       query.id,
     );
     if (result.code === 1)
@@ -148,7 +157,7 @@ export class ManagementController {
     @Req() req: any,
   ) {
     if (!req.userData) throw new UnauthorizedException('دسترسی نامعتبر است');
-    const result = await this.managementService.getUserListWithAccess(
+    const result = await this.managementService.getUserListWithAccessService(
       query.page,
       query.limit,
       query.search,
@@ -168,7 +177,7 @@ export class ManagementController {
     @Req() req: any,
   ) {
     if (!req.userData) throw new UnauthorizedException('دسترسی نامعتبر است');
-    const result = await this.managementService.messageSender(
+    const result = await this.managementService.messageSenderService(
       query.userId,
       query.entityId,
       query.type,

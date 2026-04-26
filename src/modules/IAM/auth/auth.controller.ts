@@ -12,9 +12,10 @@ import {
 import { AuthService } from './auth.service';
 import * as AuthDtos from './auth.dto';
 import { getMessage } from '../../../message/message.service';
-import { ApiOkResponse } from '@nestjs/swagger';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 
-@Controller('auth')
+@ApiTags('CLIENT/IAM')
+@Controller('client/iam/auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
