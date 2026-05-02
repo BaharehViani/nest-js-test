@@ -1,14 +1,14 @@
 import { Injectable } from "@nestjs/common";
 import { EstatePort } from "../../domain/ports/estate.port";
 import { Estate, EstateStatus } from "../../domain/entities/estate.entity";
-import { CreateEstateDto } from "../dtos/create-estate-dto";
+import * as EstateDtos from '../../application/dtos/estate.dto';
 import { Price } from "../../domain/value-objects/price.vo";
 
 @Injectable()
 export class CreateEstateService {
   constructor(private readonly estatePort: EstatePort) {}
 
-  async execute(dto: CreateEstateDto) {
+  async execute(dto: EstateDtos.CreateEstateDto) {
     const estate = new Estate(
       crypto.randomUUID(),
       dto.title,
