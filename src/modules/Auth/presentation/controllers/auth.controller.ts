@@ -18,7 +18,7 @@ export class AuthController {
 
   @Post("sendOTP")
   @ApiOkResponse({ type: AuthDtos.SendOtpResponseDto })
-  async sendOtp(@Body() body: AuthDtos.AuthSendOTPDto) {
+  async sendOtpController(@Body() body: AuthDtos.AuthSendOTPDto) {
     const result = await this.sendOtpService.execute(
       body.phoneNumber,
       body.sendOTP,
@@ -37,19 +37,19 @@ export class AuthController {
 
   @Post("login")
   @ApiOkResponse({ type: AuthDtos.AuthTokenResponseDto })
-  loginUser(@Body() body: AuthDtos.AuthLoginOTPDto) {
+  async loginUserController(@Body() body: AuthDtos.AuthLoginOTPDto) {
     return this.loginService.execute(body.phoneNumber, body.code, body.password);
   }
 
   @Post("forgetPassword")
   @ApiOkResponse({ type: AuthDtos.AuthTokenResponseDto })
-  async forgetPassword(@Body() body: AuthDtos.ForgetPasswordDto) {
+  async forgetPasswordController(@Body() body: AuthDtos.ForgetPasswordDto) {
     return this.forgetPasswordService.execute(body);
   }
 
   @Post("requestNewAccessTokenWithRefreshToken")
   @ApiOkResponse({ type: AuthDtos.AuthTokenResponseDto })
-    async refresh(@Body() body: AuthDtos.RefreshTokenDto) {
+    async newTokenWithRefreshTokenController(@Body() body: AuthDtos.RefreshTokenDto) {
     const result = await this.refreshTokenService.execute(body.refresh_token);
 
     if (result.code === 1) {
@@ -65,7 +65,7 @@ export class AuthController {
 
   @Get("userGetInfo")
   @ApiOkResponse({ type: AuthDtos.UserGetInfoResponseDto })
-  async userGetInfo(@Req() req: any, @Headers() headers: AuthDtos.AuthHeaderDto,) {
+  async userGetInfoController(@Req() req: any, @Headers() headers: AuthDtos.AuthHeaderDto,) {
 
     if (!req.userData) {
       throw new UnauthorizedException("دسترسی نامعتبر است");

@@ -7,6 +7,20 @@ export class GetEstatesListService {
   constructor(private readonly estatePort: EstatePort) {}
 
   async execute(query: GetEstatesQueryDto) {
-    return this.estatePort.findMany(query);
+
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+
+    const result = await this.estatePort.findMany({
+      ...query,
+      page,
+      limit,
+    });
+
+    return {
+      ...result,
+      page,
+      limit,
+    };
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EstatePort } from '../../domain/ports/estate.port';
 import { GetEstatesQueryDto } from '../../application/dtos/get-estates-query.dto';
-import { Price } from "../../domain/value-objects/price.vo";
+import { Price } from '../../domain/value-objects/price.vo';
 import {
   Estate as EstateEntity,
   EstateStatus as DomainEstateStatus,
@@ -142,46 +142,44 @@ export class PrismaEstatePort implements EstatePort {
     });
   }
 
-  async findMany(query: GetEstatesQueryDto) {
-  const { page, limit } = query;
-  const skip = (page - 1) * limit;
+  async findMany(query: GetEstatesQueryDto & { page: number; limit: number }) {
+    const { page, limit } = query;
+    const skip = (page - 1) * limit;
 
-  const where: any = {};
+    const where: any = {};
 
-  if (query.status)
-    where.status = query.status;
+    if (query.status) where.status = query.status;
 
-  if (query.estateGrade)
-    where.estateGrade = query.estateGrade;
+    if (query.estateGrade) where.estateGrade = query.estateGrade;
 
-  if (query.search)
-    where.title = { contains: query.search, mode: "insensitive" };
+    if (query.search)
+      where.title = { contains: query.search, mode: 'insensitive' };
 
-  if (query.minMetrage || query.maxMetrage)
-    where.metrage = {
-      gte: query.minMetrage,
-      lte: query.maxMetrage,
+    if (query.minMetrage || query.maxMetrage)
+      where.metrage = {
+        gte: query.minMetrage,
+        lte: query.maxMetrage,
+      };
+
+    if (query.minPrice || query.maxPrice)
+      where.totalPrice = {
+        gte: query.minPrice ? BigInt(query.minPrice) : undefined,
+        lte: query.maxPrice ? BigInt(query.maxPrice) : undefined,
+      };
+
+    const [items, total] = await Promise.all([
+      this.prisma.estate.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.estate.count({ where }),
+    ]);
+
+    return {
+      data: items.map((i) => this.toDomain(i)),
+      total,
     };
-
-  if (query.minPrice || query.maxPrice)
-    where.totalPrice = {
-      gte: query.minPrice ? BigInt(query.minPrice) : undefined,
-      lte: query.maxPrice ? BigInt(query.maxPrice) : undefined,
-    };
-
-  const [items, total] = await Promise.all([
-    this.prisma.estate.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-    }),
-    this.prisma.estate.count({ where }),
-  ]);
-
-  return {
-    data: items.map((i) => this.toDomain(i)),
-    total,
-  };
-}
+  }
 }

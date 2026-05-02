@@ -25,7 +25,7 @@ export class EstateController {
 
   @Post("createEstate")
   @ApiOkResponse({ type: GetEstateResponseDto })
-  async create(@Req() request: any, @Headers() headers: AuthHeaderDto, @Body() dto: CreateEstateDto) {
+  async createEstateController(@Req() request: any, @Headers() headers: AuthHeaderDto, @Body() dto: CreateEstateDto) {
 
     if (!request.userData) {
       throw new UnauthorizedException('دسترسی نامعتبر است');
@@ -39,7 +39,7 @@ export class EstateController {
   }
 
   @Get("getEstate")
-  async getById(@Req() request: any, @Headers() headers: AuthHeaderDto, @Query("id") id: string) {
+  async getEstateByIdController(@Req() request: any, @Headers() headers: AuthHeaderDto, @Query("id") id: string) {
 
     if (!request.userData) {
       throw new UnauthorizedException('دسترسی نامعتبر است');
@@ -53,7 +53,7 @@ export class EstateController {
   }
 
   @Get("getEstateList")
-  async getList(@Req() request: any, @Headers() headers: AuthHeaderDto, @Query() query: GetEstatesQueryDto) {
+  async getEstateListController(@Req() request: any, @Headers() headers: AuthHeaderDto, @Query() query: GetEstatesQueryDto) {
 
     if (!request.userData) {
       throw new UnauthorizedException('دسترسی نامعتبر است');
@@ -61,17 +61,14 @@ export class EstateController {
 
     const result = await this.getEstatesList.execute(query);
 
-    const page = query.page ?? 1;
-    const limit = query.limit ?? 10;
-
-    const totalPages = Math.ceil(result.total / limit);
+    const totalPages = Math.ceil(result.total / result.limit);
 
     return {
       message:"اطلاعات با موفقیت ارسال شد",
       data: result.data.map(EstateMapper.toResponse),
       meta: {
-        page: page,
-        limit: limit,
+        page: result.page,
+        limit: result.limit,
         total: result.total,
         totalPages: totalPages
       }
@@ -79,7 +76,7 @@ export class EstateController {
   }
 
   @Patch("editEstate")
-  async update(
+  async updateEstateController(
     @Req() request: any,
     @Headers() headers: AuthHeaderDto,
     @Query("id") id: string,
@@ -98,7 +95,7 @@ export class EstateController {
   }
 
   @Patch("editEstateStatus")
-  async changeStatus(
+  async changeEstateStatusController(
     @Req() request: any,
     @Headers() headers: AuthHeaderDto,
     @Query("id") id: string,
