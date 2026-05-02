@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EstatePort } from '../../domain/ports/estate.port';
-import { GetEstatesQueryDto } from '../../application/dtos/get-estates-query.dto';
+import * as EstateDtos from '../../application/dtos/estate.dto';
 import { Price } from '../../domain/value-objects/price.vo';
 import {
   Estate as EstateEntity,
@@ -142,7 +142,7 @@ export class PrismaEstatePort implements EstatePort {
     });
   }
 
-  async findMany(query: GetEstatesQueryDto & { page: number; limit: number }) {
+  async findMany(query: EstateDtos.GetEstatesQueryDto & { page: number; limit: number }) {
     const { page, limit } = query;
     const skip = (page - 1) * limit;
 

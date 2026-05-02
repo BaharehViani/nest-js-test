@@ -1,12 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { EstatePort } from "../../domain/ports/estate.port";
-import { GetEstatesQueryDto } from "../dtos/get-estates-query.dto";
+import * as EstateDtos from '../../application/dtos/estate.dto';
 
 @Injectable()
 export class GetEstatesListService {
   constructor(private readonly estatePort: EstatePort) {}
 
-  async execute(query: GetEstatesQueryDto) {
+  async execute(query: EstateDtos.GetEstatesQueryDto) {
 
     const page = query.page ?? 1;
     const limit = query.limit ?? 10;
