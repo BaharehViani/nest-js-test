@@ -1,8 +1,8 @@
 import { Estate } from "../../domain/entities/estate.entity";
-import { GetEstateResponseDto } from "../../application/dtos/get-estate-response.dto";
+import * as EstateDtos from '../../application/dtos/estate.dto';
 
 export class EstateMapper {
-  static toResponse(estate: Estate): GetEstateResponseDto {
+  static toResponse(estate: Estate): EstateDtos.GetEstateResponseDto {
     return {
       id: estate.id,
       title: estate.title,
