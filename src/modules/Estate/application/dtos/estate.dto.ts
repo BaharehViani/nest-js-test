@@ -75,7 +75,6 @@ export class CreateEstateDto {
   @IsOptional() @IsString() ejarePrice?: string;
 }
 
-
 export class GetEstateResponseDto {
   id: string;
   title: string;
@@ -105,7 +104,6 @@ export class GetEstateResponseDto {
   rahnPrice?: number;
   ejarePrice?: number;
 }
-
 
 export class GetEstatesQueryDto {
   @IsOptional()
@@ -197,4 +195,21 @@ export class UpdateEstateDto {
   @Type(() => Number)
   @IsNumber()
   totalPrice?: number;
+}
+
+export class Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export class GetEstateListResponseDto {
+  message: string;
+  data: GetEstateResponseDto[];
+  meta: Pagination
+}
+
+export class MessageResponseDto {
+  message: string
 }

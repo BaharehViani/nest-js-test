@@ -29,7 +29,7 @@ export class EstateController {
   ) {}
 
   @Post('createEstate')
-  @ApiOkResponse({ type: EstateDtos.GetEstateResponseDto })
+  @ApiOkResponse({ type: EstateDtos.MessageResponseDto})
   async createEstateController(
     @Req() request: any,
     @Headers() headers: EstateDtos.AuthHeaderDto,
@@ -47,6 +47,7 @@ export class EstateController {
   }
 
   @Get('getEstate')
+  @ApiOkResponse({ type: EstateDtos.GetEstateResponseDto })
   async getEstateByIdController(
     @Req() request: any,
     @Headers() headers: EstateDtos.AuthHeaderDto,
@@ -64,6 +65,7 @@ export class EstateController {
   }
 
   @Get('getEstateList')
+  @ApiOkResponse({type: EstateDtos.GetEstateListResponseDto})
   async getEstateListController(
     @Req() request: any,
     @Headers() headers: EstateDtos.AuthHeaderDto,
@@ -90,6 +92,7 @@ export class EstateController {
   }
 
   @Patch('editEstate')
+  @ApiOkResponse({ type: EstateDtos.MessageResponseDto})
   async updateEstateController(
     @Req() request: any,
     @Headers() headers: EstateDtos.AuthHeaderDto,
@@ -108,6 +111,7 @@ export class EstateController {
   }
 
   @Patch('editEstateStatus')
+  @ApiOkResponse({ type: EstateDtos.MessageResponseDto})
   async changeEstateStatusController(
     @Req() request: any,
     @Headers() headers: EstateDtos.AuthHeaderDto,
