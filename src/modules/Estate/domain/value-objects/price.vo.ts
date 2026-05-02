@@ -10,7 +10,7 @@ export class Price {
     const bigintValue = BigInt(value);
 
     if (bigintValue < 0n) {
-      throw new Error('Price cannot be negative');
+      throw new Error('قیمت نمیتواند منفی باشد');
     }
 
     return new Price(bigintValue, currency);
@@ -23,4 +23,9 @@ export class Price {
   get currency(): Currency {
     return this._currency;
   }
+
+  toNumber(): number {
+    return Number(this._value);
+  }
+
 }

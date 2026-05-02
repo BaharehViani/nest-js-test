@@ -6,12 +6,12 @@ export class GetEstatesQueryDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  page = 1;
+  page?: number = 1;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
-  limit = 10;
+  limit?: number = 10;
 
   @IsOptional()
   @IsEnum(EstateStatus)

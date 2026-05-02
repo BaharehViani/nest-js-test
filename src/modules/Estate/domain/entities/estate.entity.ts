@@ -41,4 +41,45 @@ export class Estate {
     public rahnPrice?: Price,
     public ejarePrice?: Price,
   ) {}
+
+
+  publish() {
+    if (this.status === EstateStatus.PUBLISH)
+      throw new Error("ملک منتشر شده است");
+
+    this.status = EstateStatus.PUBLISH;
+  }
+
+  unpublish() {
+    if (this.status === EstateStatus.PENDING)
+      throw new Error("ملک در وضعیت غیر فعال قرار دارد");
+
+    this.status = EstateStatus.PENDING;
+  }
+
+  updateInfo(payload: {
+    title?: string;
+    metrage?: number;
+    address?: string;
+    approximateAddress?: string;
+    estateGrade?: EstateGrade;
+    description?: string;
+    note?: string;
+    findBy?: string;
+    roomCount?: number;
+    parkingCount?: number;
+    totalPrice?: Price;
+  }) {
+    if (payload.title !== undefined) this.title = payload.title;
+    if (payload.metrage !== undefined) this.metrage = payload.metrage;
+    if (payload.address !== undefined) this.address = payload.address;
+    if (payload.approximateAddress !== undefined) this.approximateAddress = payload.approximateAddress;
+    if (payload.estateGrade !== undefined) this.estateGrade = payload.estateGrade;
+    if (payload.description !== undefined) this.description = payload.description;
+    if (payload.note !== undefined) this.note = payload.note;
+    if (payload.findBy !== undefined) this.findBy = payload.findBy;
+    if (payload.roomCount !== undefined) this.roomCount = payload.roomCount;
+    if (payload.parkingCount !== undefined) this.parkingCount = payload.parkingCount;
+    if (payload.totalPrice !== undefined) this.totalPrice = payload.totalPrice;
+  }
 }

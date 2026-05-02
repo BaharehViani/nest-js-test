@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body,Headers, Controller, Get, Param, Patch, Post, Query, Req, UnauthorizedException } from '@nestjs/common';
 import { CreateEstateService } from '../../application/services/create-estate.service';
 import { CreateEstateDto } from '../../application/dtos/create-estate-dto';
 import { EstateMapper } from '../mappers/estate.mapper';
@@ -7,6 +7,11 @@ import { GetEstateListResponseDto } from '../../application/dtos/get-estate-list
 import { GetEstatesQueryDto } from '../../application/dtos/get-estates-query.dto';
 import { GetEstateService } from '../../application/services/get-estate.service';
 import { GetEstatesListService } from '../../application/services/get-estate-list.service';
+import { UpdateEstateDto } from '../../application/dtos/update-estate.dto';
+import { ChangeEstateStatusDto } from '../../application/dtos/change-estate-status.dto';
+import { UpdateEstateService } from '../../application/services/update-estate.service';
+import { ChangeEstateStatusService } from '../../application/services/change-estate-status.service';
+import { AuthHeaderDto } from '../../application/dtos/auth-header.dto';
 
 @Controller('estates')
 export class EstateController {
@@ -14,11 +19,18 @@ export class EstateController {
     private readonly createEstateService: CreateEstateService,
     private readonly getEstate: GetEstateService,
     private readonly getEstatesList: GetEstatesListService,
+    private readonly updateEstateService: UpdateEstateService,
+    private readonly changeStatusService: ChangeEstateStatusService,
   ) {}
 
   @Post("createEstate")
   @ApiOkResponse({ type: GetEstateListResponseDto })
-  async create(@Body() dto: CreateEstateDto) {
+  async create(@Req() request: any, @Headers() headers: AuthHeaderDto, @Body() dto: CreateEstateDto) {
+
+    if (!request.userData) {
+      throw new UnauthorizedException('دسترسی نامعتبر است');
+    }
+
     await this.createEstateService.execute(dto);
 
     return {
@@ -27,13 +39,23 @@ export class EstateController {
   }
 
   @Get("getEstate")
-  async getById(@Query("id") id: string) {
+  async getById(@Req() request: any, @Headers() headers: AuthHeaderDto, @Query("id") id: string) {
+
+    if (!request.userData) {
+      throw new UnauthorizedException('دسترسی نامعتبر است');
+    }
+    
     const estate = await this.getEstate.execute(id);
     return EstateMapper.toResponse(estate);
   }
 
   @Get("getEstateList")
-  async getList(@Query() query: GetEstatesQueryDto) {
+  async getList(@Req() request: any, @Headers() headers: AuthHeaderDto, @Query() query: GetEstatesQueryDto) {
+
+    if (!request.userData) {
+      throw new UnauthorizedException('دسترسی نامعتبر است');
+    }
+
     const result = await this.getEstatesList.execute(query);
 
     return {
@@ -41,6 +63,44 @@ export class EstateController {
       page: query.page,
       limit: query.limit,
       data: result.data.map(EstateMapper.toResponse),
+    };
+  }
+
+  @Patch("editEstate")
+  async update(
+    @Req() request: any,
+    @Headers() headers: AuthHeaderDto,
+    @Query("id") id: string,
+    @Body() dto: UpdateEstateDto,
+  ) {
+
+    if (!request.userData) {
+      throw new UnauthorizedException('دسترسی نامعتبر است');
+    }
+
+    const estate = await this.updateEstateService.execute(id, dto);
+    return {
+      message: "اطلاعات ملک با موفقیت به روز شد",
+      data: EstateMapper.toResponse(estate)
+    };
+  }
+
+  @Patch("editEstateStatus")
+  async changeStatus(
+    @Req() request: any,
+    @Headers() headers: AuthHeaderDto,
+    @Query("id") id: string,
+    @Body() dto: ChangeEstateStatusDto,
+  ) {
+
+    if (!request.userData) {
+      throw new UnauthorizedException('دسترسی نامعتبر است');
+    }
+
+    const estate = await this.changeStatusService.execute(id, dto.status);
+    return {
+      message: "وضعیت ملک با موفقیت تغییر کرد",
+      data: EstateMapper.toResponse(estate)
     };
   }
 }

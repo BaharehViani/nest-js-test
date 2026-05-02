@@ -23,7 +23,7 @@ export class GetEstateListResponseDto {
   floorMetrage?: number;
   banaMetrage?: number;
 
-  totalPrice?: string;
-  rahnPrice?: string;
-  ejarePrice?: string;
+  totalPrice?: number;
+  rahnPrice?: number;
+  ejarePrice?: number;
 }
