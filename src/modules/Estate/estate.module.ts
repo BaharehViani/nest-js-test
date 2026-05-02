@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { EstateController } from './presentation/controllers/estate.controller';
 import { CreateEstateService } from './application/services/create-estate.service';
 import { EstatePort } from './domain/ports/estate.port';
-import { PrismaEstatePort } from './infrastructure/prisma/estate.prisma.port';
+import { PrismaEstateAdapter } from './infrastructure/prisma/estate.prisma.adapter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { GetEstatesListService } from './application/services/get-estate-list.service';
 import { GetEstateService } from './application/services/get-estate.service';
@@ -20,7 +20,7 @@ import { ChangeEstateStatusService } from './application/services/change-estate-
     PrismaService,
     {
       provide: EstatePort,
-      useClass: PrismaEstatePort,
+      useClass: PrismaEstateAdapter,
     },
   ],
 })

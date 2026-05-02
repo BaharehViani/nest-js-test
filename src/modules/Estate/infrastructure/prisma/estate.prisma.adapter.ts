@@ -16,7 +16,7 @@ import {
 } from '@prisma/client';
 
 @Injectable()
-export class PrismaEstatePort implements EstatePort {
+export class PrismaEstateAdapter implements EstatePort {
   constructor(private prisma: PrismaService) {}
 
   // mapper: Domain -> Prisma
