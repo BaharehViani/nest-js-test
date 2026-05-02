@@ -1,4 +1,4 @@
-export class GetEstateListResponseDto {
+export class GetEstateResponseDto {
   id: string;
   title: string;
   metrage: number;

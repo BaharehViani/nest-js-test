@@ -3,7 +3,7 @@ import { CreateEstateService } from '../../application/services/create-estate.se
 import { CreateEstateDto } from '../../application/dtos/create-estate-dto';
 import { EstateMapper } from '../mappers/estate.mapper';
 import { ApiOkResponse } from '@nestjs/swagger';
-import { GetEstateListResponseDto } from '../../application/dtos/get-estate-list-response.dto';
+import { GetEstateResponseDto } from '../../application/dtos/get-estate-response.dto';
 import { GetEstatesQueryDto } from '../../application/dtos/get-estates-query.dto';
 import { GetEstateService } from '../../application/services/get-estate.service';
 import { GetEstatesListService } from '../../application/services/get-estate-list.service';
@@ -24,7 +24,7 @@ export class EstateController {
   ) {}
 
   @Post("createEstate")
-  @ApiOkResponse({ type: GetEstateListResponseDto })
+  @ApiOkResponse({ type: GetEstateResponseDto })
   async create(@Req() request: any, @Headers() headers: AuthHeaderDto, @Body() dto: CreateEstateDto) {
 
     if (!request.userData) {
@@ -46,7 +46,10 @@ export class EstateController {
     }
     
     const estate = await this.getEstate.execute(id);
-    return EstateMapper.toResponse(estate);
+    return {
+      message:"اطلاعات با موفقیت ارسال شد",
+      data: EstateMapper.toResponse(estate)
+    };
   }
 
   @Get("getEstateList")
@@ -58,11 +61,20 @@ export class EstateController {
 
     const result = await this.getEstatesList.execute(query);
 
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 10;
+
+    const totalPages = Math.ceil(result.total / limit);
+
     return {
-      total: result.total,
-      page: query.page,
-      limit: query.limit,
+      message:"اطلاعات با موفقیت ارسال شد",
       data: result.data.map(EstateMapper.toResponse),
+      meta: {
+        page: page,
+        limit: limit,
+        total: result.total,
+        totalPages: totalPages
+      }
     };
   }
 
